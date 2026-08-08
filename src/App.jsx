@@ -804,9 +804,8 @@ export default function App() {
               </div>
             </div>
           )}
-        </main>
-
           </>}
+        </main>
         {/* ══ MODAL DOENÇA (ADD / EDIT) ══════════════════════════════════════ */}
         {modalD&&(
           <div className="overlay" onClick={e=>e.target===e.currentTarget&&fecharModal()}>
