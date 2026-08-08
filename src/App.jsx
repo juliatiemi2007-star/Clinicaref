@@ -179,35 +179,37 @@ export default function App() {
   }, []);
 
   const setDoencas = useCallback(upd => {
-    setDoencasRaw(async prev => {
+    setDoencasRaw(prev => {
       const next = typeof upd === "function" ? upd(prev) : upd;
       setSincStatus("salvando");
-      try {
-        // upsert todas — simples e confiável
-        await supa.from("doencas").upsert(next.map(d => ({id: d.id, dados: d})));
-        // remover excluídas
-        const ids = next.map(d => d.id);
-        const {data: existentes} = await supa.from("doencas").select("id");
-        const excluir = (existentes||[]).filter(r => !ids.includes(r.id)).map(r => r.id);
-        if (excluir.length) await supa.from("doencas").delete().in("id", excluir);
-        setSincStatus("ok");
-      } catch(e) { console.error("Erro ao salvar:", e); setSincStatus("erro"); }
+      (async () => {
+        try {
+          await supa.from("doencas").upsert(next.map(d => ({id: d.id, dados: d})));
+          const ids = next.map(d => d.id);
+          const {data: existentes} = await supa.from("doencas").select("id");
+          const excluir = (existentes||[]).filter(r => !ids.includes(r.id)).map(r => r.id);
+          if (excluir.length) await supa.from("doencas").delete().in("id", excluir);
+          setSincStatus("ok");
+        } catch(e) { console.error("Erro ao salvar:", e); setSincStatus("erro"); }
+      })();
       return next;
     });
   }, []);
 
   const setCasos = useCallback(upd => {
-    setCasosRaw(async prev => {
+    setCasosRaw(prev => {
       const next = typeof upd === "function" ? upd(prev) : upd;
       setSincStatus("salvando");
-      try {
-        await supa.from("casos").upsert(next.map(c => ({id: c.id, dados: c})));
-        const ids = next.map(c => c.id);
-        const {data: existentes} = await supa.from("casos").select("id");
-        const excluir = (existentes||[]).filter(r => !ids.includes(r.id)).map(r => r.id);
-        if (excluir.length) await supa.from("casos").delete().in("id", excluir);
-        setSincStatus("ok");
-      } catch(e) { console.error("Erro ao salvar:", e); setSincStatus("erro"); }
+      (async () => {
+        try {
+          await supa.from("casos").upsert(next.map(c => ({id: c.id, dados: c})));
+          const ids = next.map(c => c.id);
+          const {data: existentes} = await supa.from("casos").select("id");
+          const excluir = (existentes||[]).filter(r => !ids.includes(r.id)).map(r => r.id);
+          if (excluir.length) await supa.from("casos").delete().in("id", excluir);
+          setSincStatus("ok");
+        } catch(e) { console.error("Erro ao salvar:", e); setSincStatus("erro"); }
+      })();
       return next;
     });
   }, []);
